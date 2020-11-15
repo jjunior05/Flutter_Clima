@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import '../services/location.dart';
+import 'package:http/http.dart';
+
+String _chaveApi = '3d7b4cd6d3373fd9527add50158dbd52';
 
 class LoadingScreen extends StatefulWidget {
   @override
@@ -15,8 +18,20 @@ class _LoadingScreenState extends State<LoadingScreen> {
   void getLcoation() async {
     Location location = Location();
     await location.getCurrentLocation();
-    print(location.longitude);
-    print(location.latitude);
+    getData(location.longitude, location.latitude);
+  }
+
+  void getData(double long, double lat) async {
+    try {
+      Response response = await get(
+          'https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$long&appid=$_chaveApi');
+      if (response.statusCode == 200)
+        print(response.body);
+      else
+        print('Errro ao requisitar a API!');
+    } catch (e) {
+      print(e);
+    }
   }
 
   @override
