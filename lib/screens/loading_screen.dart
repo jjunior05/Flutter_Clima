@@ -1,8 +1,11 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../services/location.dart';
-import 'package:http/http.dart' as http;
+import '../services/networking.dart';
+import 'location_screen.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
-const String _chaveApi = '3d7b4cd6d3373fd9527add50158dbd52';
+const chaveApi = '3d7b4cd6d3373fd9527add50158dbd52';
 
 class LoadingScreen extends StatefulWidget {
   @override
@@ -12,30 +15,35 @@ class LoadingScreen extends StatefulWidget {
 class _LoadingScreenState extends State<LoadingScreen> {
   @override
   void initState() {
-    getLcoation();
+    super.initState();
+    getLocation();
   }
 
-  void getLcoation() async {
+  void getLocation() async {
     Location location = Location();
     await location.getCurrentLocation();
-    getData(location.longitude, location.latitude);
-  }
 
-  void getData(double long, double lat) async {
-    try {
-      http.Response response = await http.get(
-          'https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$long&appid=$_chaveApi');
-      if (response.statusCode == 200)
-        print(response.body);
-      else
-        print('Errro ao requisitar a API!');
-    } catch (e) {
-      print(e);
-    }
+    Networkhelper networkHelper = Networkhelper(
+        'https://api.openweathermap.org/data/2.5/weather?lat=${location.latitude}&lon=${location.longitude}&appid=$chaveApi&units=metric');
+    var weatherData = await networkHelper.getData();
+    /**
+     * Navigator for next screen and push values of context.
+     * */
+    Navigator.push(context, MaterialPageRoute(builder: (context){
+      return LocationScreen(locationWeather: weatherData,);
+    },),);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold();
+    return Scaffold(
+      body: Center(
+        child: SpinKitDoubleBounce(
+          color: Colors.white,
+          size: 100.0,
+
+        ),
+      ),
+    );
   }
 }
