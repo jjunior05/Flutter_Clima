@@ -5,10 +5,17 @@ const chaveApi = '3d7b4cd6d3373fd9527add50158dbd52';
 const openWeatherMap = 'https://api.openweathermap.org/data/2.5/weather';
 class WeatherModel {
 
+
+  Future<dynamic> getCityWeather(String cityName) async{
+    Networkhelper networkHelper = Networkhelper('$openWeatherMap?q=$cityName&appid=$chaveApi&units=metric');
+
+    var weatherData = await networkHelper.getData();
+
+    return weatherData;
+  }
   Future<dynamic> getLocationWeather() async{
     Location location = Location();
     await location.getCurrentLocation();
-
     Networkhelper networkHelper = await Networkhelper(
         '$openWeatherMap?lat=${location.latitude}&lon=${location.longitude}&appid=$chaveApi&units=metric');
     var weatherData =  networkHelper.getData();
